@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto de Venta de Vinos</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <style>
+        /* Estilo para ocultar la tabla de productos por defecto */
+        .productos {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- Aquí irá el código del encabezado, como el logo y el menú de navegación -->
+    </header>
+
+    <main>
+        <!-- Área de Miembros -->
+        <section id="miembros">
+            <div class="container">
+                <h2>Área de Miembros</h2>
+                <form action="login.php" method="post">
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" name="username" required>
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password" required>
+                    <button type="submit">Iniciar sesión</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Área de Productos -->
+        <section id="productos">
+            <div class="container">
+                <h2>Área de Productos</h2>
+                <div class="categorias">
+                    <button class="btn-categoria" data-categoria="Vinos Tintos">Vinos Tintos</button>
+                    <button class="btn-categoria" data-categoria="Vinos Blancos">Vinos Blancos</button>
+                    <button class="btn-categoria" data-categoria="Espumantes">Espumantes</button>
+                </div>
+
+                <!-- Tabla de Productos -->
+                <div class="productos">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID Producto</th>
+                                <th>Nombre</th>
+                                <th>Precio de Costo</th>
+                                <th>Precio de Venta</th>
+                                <th>Cantidad Disponible</th>
+                                <th>Característica</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productos-tbody">
+                            <!-- Aquí se cargarán los productos de la categoría seleccionada -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- Área de Pedidos -->
+        <section id="pedidos">
+            <div class="container">
+                <h2>Área de Pedidos</h2>
+                <!-- Tabla de Pedidos -->
+                <div class="pedido">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pedido-tbody">
+                            <!-- Aquí se cargarán los productos del pedido -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="subtotal-total">
+                    <p>Subtotal: <span id="subtotal">0.00</span></p>
+                    <p>Total: <span id="total">0.00</span></p>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- Área de Mesas -->
+        <section id="mesas">
+            <div class="container">
+                <h2>Área de Mesas</h2>
+                <!-- Aquí puedes agregar un mapa o imágenes de las mesas -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <!-- Aquí irá el código del pie de página, como información de contacto y enlaces adicionales -->
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Variable para controlar si la tabla de productos está visible o no
+        var productosVisible = false;
+    
+        // Variable para almacenar los productos seleccionados en el pedido
+        var pedido = [];
+    
+        // Código jQuery para cargar los productos de la categoría seleccionada
+        $(document).ready(function() {
+            $('.btn-categoria').on('click', function() {
+                var categoria = $(this).data('categoria');
+                cargarProductos(categoria);
+            });
+    
+            // Código jQuery para agregar productos al pedido
+            $(document).on('click', '.btn-agregar-pedido', function() {
+                var productoId = $(this).data('id');
+                agregarProductoPedido(productoId);
+            });
+
+    
+            // Código jQuery para eliminar productos del pedido
+            $(document).on('click', '.btn-eliminar-pedido', function() {
+                var productoId = $(this).data('id');
+                eliminarProductoPedido(productoId);
+            });
+        });
+    
+        function cargarProductos(categoria) {
+            // Si la tabla de productos está visible y la categoría es la misma, la ocultamos
+            if (productosVisible) {
+                ocultarProductos();
+                return;
+            }
+    
+            // Limpiamos la tabla antes de agregar los nuevos productos
+            $('#productos-tbody').empty();
+    
+            // Mostramos la tabla de productos
+            mostrarProductos();
+    
+            // Aquí puedes realizar una petición AJAX para obtener los productos de la categoría
+            // Por ejemplo:
+            $.ajax({
+                url: 'obtener_productos.php',
+                type: 'GET',
+                data: {categoria: categoria},
+                success: function(data) {
+                    // En este ejemplo, suponemos que recibimos los datos en formato JSON
+                    // Puedes adaptar esto según cómo estés obteniendo los datos desde tu base de datos
+                    var productos = JSON.parse(data);
+    
+                    // Recorremos los productos y los agregamos a la tabla
+                    for (var i = 0; i < productos.length; i++) {
+                        var producto = productos[i];
+                        var fila = '<tr>' +
+                                   '<td>' + producto.nombre + '</td>' +
+                                   '<td>' + producto.precio_venta + '</td>' +
+                                   '<td><input type="number" min="1" value="1" class="cantidad-producto"></td>' +
+                                   '<td class="subtotal-producto">' + producto.precio_venta + '</td>' +
+                                   '<td><button class="btn-agregar-pedido" data-id="' + producto.id + '">Agregar</button></td>' +
+                                   '</tr>';
+                        $('#productos-tbody').append(fila);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error al obtener los productos:', error);
+                }
+            });
+        }
+    
+        // Función para mostrar la tabla de productos
+        function mostrarProductos() {
+            $('.productos').show();
+            productosVisible = true;
+        }
+    
+        // Función para ocultar la tabla de productos
+        function ocultarProductos() {
+            $('.productos').hide();
+            productosVisible = false;
+        }
+    
+        // Función para agregar un producto al pedido
+        function agregarProductoPedido(id) {
+            var producto = {};
+            producto.id = id;
+            producto.nombre = $(`#productos-tbody tr[data-producto-id="${id}"] td:nth-child(2)`).text();
+            producto.precio = parseFloat($(`#productos-tbody tr[data-producto-id="${id}"] td:nth-child(3)`).text());
+            producto.cantidad = parseInt($(`#productos-tbody tr[data-producto-id="${id}"] .cantidad-producto`).val());
+            producto.subtotal = producto.precio * producto.cantidad;
+
+            // Verificamos si el producto ya existe en el pedido
+            var index = pedido.findIndex(item => item.id === id);
+            if (index !== -1) {
+                pedido[index].cantidad += producto.cantidad;
+                pedido[index].subtotal += producto.subtotal;
+            } else {
+                pedido.push(producto);
+            }
+
+            actualizarTablaPedido();
+        }
+
+    
+        // Función para eliminar un producto del pedido
+        function eliminarProductoPedido(id) {
+            var index = pedido.findIndex(item => item.id === id);
+            if (index !== -1) {
+                pedido.splice(index, 1);
+                actualizarTablaPedido();
+            }
+        }
+    
+        // Función para actualizar la tabla de pedidos y calcular subtotal y total
+        function actualizarTablaPedido() {
+            var pedidoTbody = $('#pedido-tbody');
+            pedidoTbody.empty();
+
+            var subtotal = 0;
+            for (var i = 0; i < pedido.length; i++) {
+                var producto = pedido[i];
+                var fila = '<tr>' +
+                        '<td>' + producto.nombre + '</td>' +
+                        '<td>' + producto.precio.toFixed(2) + '</td>' +
+                        '<td>' + producto.cantidad + '</td>' +
+                        '<td class="subtotal-producto">' + producto.subtotal.toFixed(2) + '</td>' +
+                        '<td><button class="btn-eliminar-pedido" data-id="' + producto.id + '">Eliminar</button></td>' +
+                        '</tr>';
+                pedidoTbody.append(fila);
+                subtotal += producto.subtotal;
+            }
+
+            $('#subtotal').text(subtotal.toFixed(2));
+            $('#total').text(subtotal.toFixed(2)); // El total es igual al subtotal, puedes agregar impuestos o descuentos si es necesario
+        }
+
+    </script>
+    
+    
+    
+</body>
+</html>

@@ -1,0 +1,59 @@
+/* Estilos para el cuerpo de la página */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    text-align: center; /* Centrar el texto en el cuerpo de la página */
+}
+
+/* Estilos para los encabezados */
+h1, h2, h3 {
+    font-family: 'Verdana', sans-serif;
+    color: #007bff;
+}
+
+/* Estilos para los enlaces */
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos para los botones */
+button, a.btn-categoria {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px; /* Agregar espacio entre los botones */
+}
+
+/* Estilos para las imágenes */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Estilos para la tabla de productos */
+table {
+    margin: 0 auto; /* Centrar la tabla */
+    border-collapse: collapse;
+    width: 80%; /* Ajustar el ancho de la tabla */
+}
+
+th, td {
+    border: 1px solid #333;
+    padding: 8px;
+}
+
+th {
+    background-color: #007bff;
+    color: #fff;
+}
